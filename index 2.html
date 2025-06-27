@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>تقسیم درآمد</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: sans-serif; direction: rtl; background: #f9f9f9; padding: 20px; text-align: center; }
+    input, button { padding:10px; font-size:16px; margin:10px; border-radius:5px; }
+    .result { margin-top:20px; background:#fff; padding:20px; border-radius:10px; box-shadow:0 0 8px rgba(0,0,0,0.1); }
+    canvas { max-width:400px; margin-top:20px; }
+  </style>
+</head>
+<body>
+  <h1>تقسیم هوشمند درآمد</h1>
+  <input type="number" id="income" placeholder="مثلاً 10 دلار">
+  <button onclick="calculate()">محاسبه</button>
+  <div class="result" id="output" style="display:none;"></div>
+  <canvas id="incomeChart" style="display:none;"></canvas>
+
+  <script>
+    function calculate() {
+      const income = parseFloat(document.getElementById("income").value);
+      if (isNaN(income) || income <= 0) { alert("لطفاً یک مبلغ معتبر وارد کن."); return; }
+
+      const kh = income * 0.5;
+      const km = income * 0.1;
+      const pa = income * 0.1;
+      const sa = income * 0.3;
+
+      document.getElementById("output").innerHTML = `
+        <strong>نتایج تقسیم‌بندی:</strong><br><br>
+        🛒 هزینه‌های روزمره: ${kh.toFixed(2)}<br>
+        💖 کمک: ${km.toFixed(2)}<br>
+        🏦 پس‌انداز: ${pa.toFixed(2)}<br>
+        💼 سرمایه‌گذاری: ${sa.toFixed(2)}
+      `;
+      document.getElementById("output").style.display = "block";
+      localStorage.setItem("lastIncome", income);
+
+      const ctx = document.getElementById("incomeChart").getContext("2d");
+      document.getElementById("incomeChart").style.display = "block";
+      if (window.chart) window.chart.destroy();
+      window.chart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['هزینه','کمک','پس‌انداز','سرمایه‌گذاری'],
+          datasets:[{data:[kh,km,pa,sa], backgroundColor:['#FF6384','#36A2EB','#FFCE56','#4CAF50']}]
+        },
+        options:{responsive:true, plugins:{legend:{position:'bottom'}}}
+      });
+    }
+
+    window.onload = function(){
+      const last = localStorage.getItem("lastIncome");
+      if (last) { document.getElementById("income").value = last; calculate(); }
+    }
+  </script>
+</body>
+</html>
